@@ -1,0 +1,56 @@
+// Bootstrap overrides
+//
+// Copy variables from `_variables.scss` to this file to override default values
+// without modifying source files.
+
+// See https://github.com/twbs/bootstrap/blob/v4-dev/scss/_variables.scss
+
+// Colours
+
+// Uncomment and customise as required
+// $brand-primary:             #f7df1e;
+
+// Options
+
+$enable-flex:               true;
+$enable-rounded:            false;
+$enable-shadows:            false;
+$enable-gradients:          false;
+$enable-transitions:        true;
+
+// Typography
+
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-base:       $font-family-sans-serif;
+
+.tagline{
+  margin: 10em 3em;
+
+  @media (max-width: 576px){
+    margin: 3em 3em;
+  }
+}
+
+.contact-address{
+  @media (max-width: 576px){
+    padding: 2em 1em;
+  }
+}
+
+body.cv {
+  padding-top: 2em;
+}
+
+section.row{
+  margin-top: 3em;
+}
+
+.role {
+  margin-top: 2em;
+  padding-top: 1em;
+  border-top: 1px solid #eee;
+}
+
+.achivements li, .education li{
+  margin: 1em;
+}
