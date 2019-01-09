@@ -127,6 +127,15 @@ module Api
 end
 ```
 
-The views are [jbuilder](https://github.com/rails/jbuilder) templates.
+The views are [jbuilder](https://github.com/rails/jbuilder) templates, and again quite simple.
 
-And that's all there is to it! 🎉
+And that's all there is to it, pretty simple, isn't it?
+
+Of course, if I start to need more features the code will become more complicated. But I think [Gall's Law](https://personalmba.com/galls-law/) applies:
+
+> A complex system that works is invariably found to have evolved from a simple system that worked.
+>
+> **John Gall, systems theorist**
+
+If I ever build a more complex API that works, it will
+be the evolution of a simple API that works.
