@@ -25,6 +25,13 @@
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
   ga('create', '{{site.google_analytics}}', 'auto');
+
+  document.addEventListener("turbolinks:load", function(event) {
+    if ( typeof ga === "function" ) {
+      ga("set", "location", event.data.url)
+      ga("send", "pageview")
+    }
+  })
 </script>
 {% endif %}
 
