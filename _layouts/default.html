@@ -1,14 +1,95 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
-  {% include head.html %}
-  <body>
+<html lang="en">
 
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">{{ content }}</div>
-      </div>
+{% include head.html %}
+
+{% capture layout %}{% if page.layout %}layout-{{ page.layout }}{% endif %}{% endcapture %}
+<body class="{{ layout }}">
+
+
+<!-- Begin Menu Navigation
+================================================== -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top mediumnavigation nav-down">
+
+    <div class="container pr-0">
+
+    <!-- Site brand
+    ================================================== -->
+    <a class="navbar-brand" href="/">
+      {{ site.name }}
+      <small class="text-muted d-none d-md-inline">{{ site.description }}</small>
+    </a>
+    <!-- End brand -->
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMediumish" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+    <div class="collapse navbar-collapse" id="navbarMediumish">
+
+        <!-- Begin Menu -->
+
+            <ul class="navbar-nav ml-auto">
+
+                {% if page.url == "/" %}
+                <li class="nav-item active">
+                {% else %}
+                <li class="nav-item">
+                {% endif %}
+                <a class="nav-link" href="{{ site.baseurl }}/index.html">Blog</a>
+                </li>
+
+                {% if page.url == "/about.html" %}
+                <li class="nav-item active">
+                {% else %}
+                <li class="nav-item">
+                {% endif %}
+                <a class="nav-link" href="{{ site.baseurl }}/about">About</a>
+                </li>
+
+                <li class="nav-item">
+                <a target="_blank"  class="nav-link" href="https://twitter.com/afcapel"><i class="fab fa-twitter"></i></a>
+                </li>
+
+            </ul>
+
+        <!-- End Menu -->
+
     </div>
 
-    {% include footer.html %}
-  </body>
+    </div>
+</nav>
+<!-- End Navigation
+================================================== -->
+
+<div class="site-content">
+<div class="container">
+
+
+
+<!-- Content
+================================================== -->
+<div class="main-content">
+    {{ content }}
+</div>
+
+</div><!-- /.container>
+
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container text-center">
+      <p class="text-center">
+        Copyright © {{ site.time | date: "%Y" }} {{ site.name }}
+      </p>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+
+</div> <!-- /.site-content>
+</body>
 </html>

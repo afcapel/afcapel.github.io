@@ -1,15 +1,13 @@
 ---
 layout: page
-title: About
-permalink: /about/
+title: About afcapel.com
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+Hi, I'm Alberto Fernández-Capel and this is my personal website. I'm a web
+developer specialised in Ruby and JavaScript.
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jekyll" %} /
-[minima](https://github.com/jekyll/minima)
+I'm currently bootstraping a meal planner web application called
+[Gazpacho](https://www.gazpachoapp.com). Check it out!
 
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+You can find me on [Twitter](https://twitter.com/afcapel) or
+[Github](https://github.com/afcapel).
