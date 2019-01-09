@@ -3,7 +3,7 @@ name: "Alberto Fernández-Capel"
 description: "Personal Blog"
 meta_description: "Alberto Fernández-Capel Personal Website"
 logo: 'assets/images/afcapel.svg'
-baseurl: https://afcapel.com
+baseurl:
 google_analytics: 'UA-106537463-2'
 
 # Authors
