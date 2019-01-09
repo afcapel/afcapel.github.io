@@ -5,19 +5,18 @@
     <description>Personal Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 09 Jan 2019 00:44:00 +0000</pubDate>
-    <lastBuildDate>Wed, 09 Jan 2019 00:44:00 +0000</lastBuildDate>
+    <pubDate>Wed, 09 Jan 2019 01:07:18 +0000</pubDate>
+    <lastBuildDate>Wed, 09 Jan 2019 01:07:18 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
         <title>A minimalistic foundation for a Rails REST API</title>
         <description>&lt;p&gt;While working on &lt;a href=&quot;https://www.gazpachoapp.com&quot;&gt;Gazpacho&lt;/a&gt; I came to a point where
 I started to think it would be nice to have an API. Over the years I’ve worked
-with big Rails applications in which the base api controller had hundreds of lines of
-code and used dozens of auxiliary classes. But in my case requirements are very simple: I’m in control of all the clients that will consume the API, so I don’t need any sophisticated authentication mechanism and I can live with bare bone error messages without worrying about leaking too much information. This is close to the simplest case you can find
-and I started to wonder what is the bare minimum I would need to build a simple REST API (I don’t
+with big Rails applications in which the base API controller had hundreds of lines of
+code and used dozens of auxiliary classes. But in my case requirements are very simple: I’m in control of all the clients that will consume the API, so I don’t need any sophisticated authentication mechanism and I can live with bare bone error messages without worrying about leaking too much information. This is as simple as it gets and I started to wonder what is the bare minimum I would need to build that simple REST API (I don’t
 need the added complexity of a GraphQL API, thank you very much). After finishing the API I was so pleased
-with the result I thought I’d share it in case someone else find it useful.&lt;/p&gt;
+with the minimalism of the result that I thought I’d share it in case someone else find it useful.&lt;/p&gt;
 
 &lt;p&gt;The base controller is only ~ 40LOC (19 SLOC):&lt;/p&gt;
 
@@ -66,7 +65,7 @@ with the result I thought I’d share it in case someone else find it useful.&lt
 &lt;p&gt;It handles pagination and error rendering. For pagination I’m using &lt;a href=&quot;https://github.com/kaminari/kaminari&quot;&gt;Kaminari&lt;/a&gt; and including the pagination info in &lt;code class=&quot;highlighter-rouge&quot;&gt;Link&lt;/code&gt; headers,
 following the &lt;a href=&quot;https://tools.ietf.org/html/rfc5988&quot;&gt;RFC5988 specification&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;There’s also a minimal module to implement token authentication (the api is behind https):&lt;/p&gt;
+&lt;p&gt;There’s also a minimal module to implement token authentication (that’s all I really need).&lt;/p&gt;
 
 &lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Api&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Authentication&lt;/span&gt;
@@ -127,11 +126,11 @@ following the &lt;a href=&quot;https://tools.ietf.org/html/rfc5988&quot;&gt;RFC5
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;The views are &lt;a href=&quot;https://github.com/rails/jbuilder&quot;&gt;jbuilder&lt;/a&gt; templates, and again quite simple.&lt;/p&gt;
+&lt;p&gt;It can perform all the basic REST actions (list, show, create, update and delete) and print responses and validation errors in json format. The views are &lt;a href=&quot;https://github.com/rails/jbuilder&quot;&gt;jbuilder&lt;/a&gt; templates, and again quite simple.&lt;/p&gt;
 
-&lt;p&gt;And that’s all there is to it, pretty simple, isn’t it?&lt;/p&gt;
+&lt;p&gt;And that’s all there is to it! Pretty simple, isn’t it?&lt;/p&gt;
 
-&lt;p&gt;Of course, if I start to need more features the code will become more complicated. But I think &lt;a href=&quot;https://personalmba.com/galls-law/&quot;&gt;Gall’s Law&lt;/a&gt; applies:&lt;/p&gt;
+&lt;p&gt;Of course, if I start to need more features the code will become more complicated. But I think &lt;a href=&quot;https://personalmba.com/galls-law/&quot;&gt;Gall’s Law&lt;/a&gt; applies here too:&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;A complex system that works is invariably found to have evolved from a simple system that worked.&lt;/p&gt;
@@ -139,8 +138,7 @@ following the &lt;a href=&quot;https://tools.ietf.org/html/rfc5988&quot;&gt;RFC5
   &lt;p&gt;&lt;strong&gt;John Gall, systems theorist&lt;/strong&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;If I ever build a more complex API that works, it will
-be the evolution of a simple API that works.&lt;/p&gt;
+&lt;p&gt;If I ever build a more complex API that works, it will be the evolution of a simple API that works.&lt;/p&gt;
 </description>
         <pubDate>Wed, 09 Jan 2019 00:00:00 +0000</pubDate>
         <link>http://localhost:4000/articles/2019/01/09/minimalistic-rails-api.html</link>

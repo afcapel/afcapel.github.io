@@ -10,11 +10,10 @@ hidden: false
 
 While working on [Gazpacho](https://www.gazpachoapp.com) I came to a point where
 I started to think it would be nice to have an API. Over the years I've worked
-with big Rails applications in which the base api controller had hundreds of lines of
-code and used dozens of auxiliary classes. But in my case requirements are very simple: I'm in control of all the clients that will consume the API, so I don't need any sophisticated authentication mechanism and I can live with bare bone error messages without worrying about leaking too much information. This is close to the simplest case you can find
-and I started to wonder what is the bare minimum I would need to build a simple REST API (I don't
+with big Rails applications in which the base API controller had hundreds of lines of
+code and used dozens of auxiliary classes. But in my case requirements are very simple: I'm in control of all the clients that will consume the API, so I don't need any sophisticated authentication mechanism and I can live with bare bone error messages without worrying about leaking too much information. This is as simple as it gets and I started to wonder what is the bare minimum I would need to build that simple REST API (I don't
 need the added complexity of a GraphQL API, thank you very much). After finishing the API I was so pleased
-with the result I thought I'd share it in case someone else find it useful.
+with the minimalism of the result that I thought I'd share it in case someone else find it useful.
 
 The base controller is only ~ 40LOC (19 SLOC):
 
@@ -64,7 +63,7 @@ end
 It handles pagination and error rendering. For pagination I'm using [Kaminari](https://github.com/kaminari/kaminari) and including the pagination info in `Link` headers,
 following the [RFC5988 specification](https://tools.ietf.org/html/rfc5988).
 
-There's also a minimal module to implement token authentication (the api is behind https):
+There's also a minimal module to implement token authentication (that's all I really need).
 
 ```ruby
 module Api
@@ -127,15 +126,14 @@ module Api
 end
 ```
 
-The views are [jbuilder](https://github.com/rails/jbuilder) templates, and again quite simple.
+It can perform all the basic REST actions (list, show, create, update and delete) and print responses and validation errors in json format. The views are [jbuilder](https://github.com/rails/jbuilder) templates, and again quite simple.
 
-And that's all there is to it, pretty simple, isn't it?
+And that's all there is to it! Pretty simple, isn't it?
 
-Of course, if I start to need more features the code will become more complicated. But I think [Gall's Law](https://personalmba.com/galls-law/) applies:
+Of course, if I start to need more features the code will become more complicated. But I think [Gall's Law](https://personalmba.com/galls-law/) applies here too:
 
 > A complex system that works is invariably found to have evolved from a simple system that worked.
 >
 > **John Gall, systems theorist**
 
-If I ever build a more complex API that works, it will
-be the evolution of a simple API that works.
+If I ever build a more complex API that works, it will be the evolution of a simple API that works.
