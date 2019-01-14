@@ -3,10 +3,10 @@
   <channel>
     <title></title>
     <description>Personal Blog</description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 09 Jan 2019 01:14:09 +0000</pubDate>
-    <lastBuildDate>Wed, 09 Jan 2019 01:14:09 +0000</lastBuildDate>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Mon, 14 Jan 2019 20:35:25 +0000</pubDate>
+    <lastBuildDate>Mon, 14 Jan 2019 20:35:25 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -141,8 +141,8 @@ following the &lt;a href=&quot;https://tools.ietf.org/html/rfc5988&quot;&gt;RFC5
 &lt;p&gt;If I ever build a more complex API that works, it will be the evolution of a simple API that works.&lt;/p&gt;
 </description>
         <pubDate>Wed, 09 Jan 2019 00:00:00 +0000</pubDate>
-        <link>http://localhost:4000/articles/2019/01/09/minimalistic-rails-api.html</link>
-        <guid isPermaLink="true">http://localhost:4000/articles/2019/01/09/minimalistic-rails-api.html</guid>
+        <link>/articles/2019/01/09/minimalistic-rails-api.html</link>
+        <guid isPermaLink="true">/articles/2019/01/09/minimalistic-rails-api.html</guid>
         
         
         <category>articles</category>
