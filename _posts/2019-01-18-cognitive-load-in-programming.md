@@ -3,7 +3,7 @@ layout: post
 title:  "Cognitive load in programming: why the brain is the bottleneck"
 author: alberto
 categories: articles
-image: assets/images/brain.jpg
+image: assets/images/brain.png
 featured: true
 hidden: false
 ---
@@ -47,7 +47,7 @@ Learning materials are designed to minimise extraneous load and maximise germane
 
 ## Good software design minimises cognitive load
 
-**Software design principles are mostly attempts to minimise cognitive load**. Good design simplifies making changes to existing code by limiting the amount of context you have to hold in your working memory. If in order to change a class you need to understand 12 other classes that use it, you will find very difficult to hold all that information in the working memory and make the change. It is much more likely that you’ll make a mistake. 
+**Software design principles are mostly attempts to minimise cognitive load**. Good design simplifies making changes to existing code by limiting the amount of context you have to hold in your working memory. If in order to change a class you need to understand 12 other classes that use it, you will find very difficult to hold all that information in the working memory and make the change. It is much more likely that you’ll make a mistake.
 
 Good design always tries to avoid cognitive overload. For instance we can use encapsulation; we provide abstractions and clear interfaces to hide the underlying complexity. To make a change in a well encapsulated code you only need to understand the exposed API, you don't have to understand how the client code works or the details of the implementation. That makes the easier for your brain to hold the necessary information in the working memory and reason about it without errors.
 
