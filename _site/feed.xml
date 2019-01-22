@@ -3,11 +3,168 @@
   <channel>
     <title></title>
     <description>Personal Blog</description>
-    <link>/</link>
-    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 22 Jan 2019 01:25:42 +0000</pubDate>
-    <lastBuildDate>Tue, 22 Jan 2019 01:25:42 +0000</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 22 Jan 2019 19:15:22 +0000</pubDate>
+    <lastBuildDate>Tue, 22 Jan 2019 19:15:22 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>How to neatly organise assets in a Rails app</title>
+        <description>&lt;p&gt;One of the great things about Rails is that it comes packed with a lot of useful
+conventions. I can open open a new Rails application and I immediately know where the
+controllers are and how they are mapped to their views. On the other hand, Rails
+doesn’t provide much of a guideline about how you should organise your assets. This
+is probably a cultural issue: rails developers are usually more proficient
+with backend programming than with css or javascript. But there’s also a natural
+relationship between assets and views. We can leverage this relationship to map assets
+to views, in the same way that views are mapped to controllers.&lt;/p&gt;
+
+&lt;p&gt;First things first, let’s clarify what we want to achieve: &lt;strong&gt;we want to make dead easy to understand which assets assets are used in any part of the app&lt;/strong&gt;. The mapping should also work the other way around: given a css or js file, it should be obvious where in the app is used.
+How can we achieve that?&lt;/p&gt;
+
+&lt;p&gt;Let’s say we have a typical rails controller dir:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;app/controllers
+├── admin
+│   ├── base_controller.rb
+│   ├── dashboard_controller.rb
+│   ├── ... other admin controllers
+├── api
+│   ├── base_controller.rb
+│   └── ... other api controllers
+├── application_controller.rb
+├── authenticated
+│   ├── onboarding
+│   │   ├── base_controller.rb
+│   │   └── ... other onboarding controllers
+│   ├── settings
+│   │   ├── accounts_controller.rb
+│   │   └── ... other settings controllers
+│   ├── base_controller.rb
+│   ├── .. other authenticated controllers
+└── public
+    ├── base_controller.rb
+    └──  ... other public controllers
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This is all standard rails with some fairly typical namespacing. At the top level we have
+a few namespaces for the main areas of the app: &lt;code class=&quot;highlighter-rouge&quot;&gt;admin&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;api&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;authenticated&lt;/code&gt;,
+and &lt;code class=&quot;highlighter-rouge&quot;&gt;public&lt;/code&gt;. &lt;strong&gt;Each one of these main areas have its own base controller and a
+specific layout&lt;/strong&gt;. The &lt;code class=&quot;highlighter-rouge&quot;&gt;authenticated&lt;/code&gt; namespace is for pages that can only be seen
+by authenticated users and it’s the bulk of the app. Because it’s so big, it has a few subnamespaces for it’s thematic subareas: &lt;code class=&quot;highlighter-rouge&quot;&gt;settings&lt;/code&gt; for all the settings controllers, &lt;code class=&quot;highlighter-rouge&quot;&gt;onboarding&lt;/code&gt; for all the controllers dealing with user onboarding.&lt;/p&gt;
+
+&lt;p&gt;Following rails conventions, the views associated with these controller have the
+same directory structure:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;app/views
+├── admin
+│   ├── dashboard
+│   │   └── show.html.erb
+│   ├── ... other admin views
+├── api
+│   └── ... api jbuilder views
+├── authenticated
+│   ├── ... authenticated views
+│   ├── onboarding
+│   │   ├── ... onboarding views
+│   ├── settings
+│   │   ├── ... settings views
+├── layouts
+│   ├── admin.html.erb
+│   ├── application.html.erb
+│   ├── mailer.html.erb
+│   └── public.html.erb
+├── public
+│   └── ... public views
+└── shared &amp;lt;- These are partials shared by different controllers
+   ├── _error_messages.html.erb
+   ├── _flash.html.erb
+   └── .. other shared partials
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;So we have views mapped by convention to controllers, and that makes it very easy
+to know which view is used for each controller and what controllers is associated with a view.
+&lt;strong&gt;The next natural step is to use the same mapping from vies to stylesheets&lt;/strong&gt;. My stylesheet
+dir looks like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;app/assets/stylesheets
+├── admin
+│   ├── _dashboard.scss &amp;lt;- styles used by all admin/dashboard actions
+│   │   └── _show.scss  &amp;lt;- styles used by the admin/dashboard#show action
+│   └── shared &amp;lt;- These are partials that are shared by all admin views
+│       ├── _layout.scss &amp;lt;- styles for the admin layout
+│       ├── _navbar.scss &amp;lt;- Other partials used in
+│       └── _sidebar.scss
+├── admin.scss
+├── authenticated
+│   ├── _layout.scss
+│   ├── _onboarging.scss  &amp;lt;- These are partials that are shared by all onboarding views
+│   ├── settings &amp;lt;- These are partials that are shared by all settings views
+│   │   └── subscriptions
+│   │       └── _show.scss &amp;lt;- Styles only used in settings/subscriptions/show
+│   └── shared &amp;lt;- Common components. These are partials that are shared by all views
+│       ├── _card.scss
+│       ├── ... other components
+│       ├── _spinner.scss
+│       └── _thumbs.scss
+├── authenticated.scss &amp;lt;- main css for the authenticated layout
+├── public
+│   ├── _layout.scss
+│   └── shared  &amp;lt;- These are partials that are shared by public views
+│       └── ... components only used in the public layout
+├── public.scss &amp;lt;- main css for the public layout
+└── shared &amp;lt;- css shared by all layouts
+    ├── _functions.scss
+    ├── _mixins.scss
+    ├── _variables.scss
+    ├── pills.scss
+    └── ... other global components
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The directory structure follows the same layout than views and controllers. &lt;strong&gt;The main
+rule is to always nest the file name to the most specific folder possible&lt;/strong&gt;. For instance:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;If some styles are only needed in &lt;code class=&quot;highlighter-rouge&quot;&gt;app/views/admin/dashboard/show.html.erb&lt;/code&gt; they will
+go in &lt;code class=&quot;highlighter-rouge&quot;&gt;app/assets/stylesheets/admin/dashboard/_show.scss&lt;/code&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If they are shared between actions in the &lt;code class=&quot;highlighter-rouge&quot;&gt;admin/dashboard_controller&lt;/code&gt;, they would go
+in &lt;code class=&quot;highlighter-rouge&quot;&gt;app/assets/stylesheets/admin/dashboard.scss&lt;/code&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If they are shared by different admin controllers, they go in
+&lt;code class=&quot;highlighter-rouge&quot;&gt;app/assets/stylesheets/admin/shared/name_of_the_component.scss&lt;/code&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If they are shared by controllers with different layouts, they go in
+&lt;code class=&quot;highlighter-rouge&quot;&gt;app/assets/stylesheets/shared/name_of_the_component.scss&lt;/code&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The top level stylesheets just include the folders they need. For instance,
+&lt;code class=&quot;highlighter-rouge&quot;&gt;app/assets/stylesheets/admin.scss&lt;/code&gt; is just:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;@import&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&quot;shared/**/*&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;@import&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&quot;admin/**/*&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;These days I mostly use &lt;a href=&quot;https://stimulusjs.org/&quot;&gt;stimulus&lt;/a&gt; for the front end. Stimulus
+already comes with sensible file naming convention. But if you still have a lot of
+js sprinkles in your app, you can use the same convention to organise &lt;code class=&quot;highlighter-rouge&quot;&gt;app/assets/javascripts&lt;/code&gt;.
+In this way you only need one criteria to organise most of the code in your application:
+from controllers, to views, including css and javascript.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 22 Jan 2019 00:00:00 +0000</pubDate>
+        <link>http://localhost:4000/articles/2019/01/22/how-to-organise-assets-rails-app.html</link>
+        <guid isPermaLink="true">http://localhost:4000/articles/2019/01/22/how-to-organise-assets-rails-app.html</guid>
+        
+        
+        <category>articles</category>
+        
+      </item>
     
       <item>
         <title>Cognitive load in programming: why the brain is the bottleneck</title>
@@ -66,8 +223,8 @@
 &lt;p&gt;Sometimes we also hear the opposite advice. For instance, we &lt;a href=&quot;https://dhh.dk//2014/test-induced-design-damage.html&quot;&gt;can make our tests run faster if we are willing to pay a price in added complexity&lt;/a&gt;. I like fast tests like anyone else but I’m always very wary of trading speed for complexity. Computer cycles are cheap and easily scalable. &lt;strong&gt;Computer power can scale&lt;/strong&gt; horizontally (buying more computers) or vertically (buying more powerful computers). But &lt;strong&gt;your brain capacity is mostly fixed and painfully limited&lt;/strong&gt;. In programming, the brain is often the  main bottleneck.&lt;/p&gt;
 </description>
         <pubDate>Fri, 18 Jan 2019 00:00:00 +0000</pubDate>
-        <link>/articles/2019/01/18/cognitive-load-in-programming.html</link>
-        <guid isPermaLink="true">/articles/2019/01/18/cognitive-load-in-programming.html</guid>
+        <link>http://localhost:4000/articles/2019/01/18/cognitive-load-in-programming.html</link>
+        <guid isPermaLink="true">http://localhost:4000/articles/2019/01/18/cognitive-load-in-programming.html</guid>
         
         
         <category>articles</category>
@@ -206,8 +363,8 @@ following the &lt;a href=&quot;https://tools.ietf.org/html/rfc5988&quot;&gt;RFC5
 &lt;p&gt;If I ever build a more complex API that works, it will be the evolution of a simple API that works.&lt;/p&gt;
 </description>
         <pubDate>Wed, 09 Jan 2019 00:00:00 +0000</pubDate>
-        <link>/articles/2019/01/09/minimalistic-rails-api.html</link>
-        <guid isPermaLink="true">/articles/2019/01/09/minimalistic-rails-api.html</guid>
+        <link>http://localhost:4000/articles/2019/01/09/minimalistic-rails-api.html</link>
+        <guid isPermaLink="true">http://localhost:4000/articles/2019/01/09/minimalistic-rails-api.html</guid>
         
         
         <category>articles</category>
