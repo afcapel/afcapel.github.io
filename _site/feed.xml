@@ -3,10 +3,10 @@
   <channel>
     <title></title>
     <description>Personal Blog</description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 18 Jan 2019 14:26:55 +0000</pubDate>
-    <lastBuildDate>Fri, 18 Jan 2019 14:26:55 +0000</lastBuildDate>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 22 Jan 2019 01:24:20 +0000</pubDate>
+    <lastBuildDate>Tue, 22 Jan 2019 01:24:20 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -66,8 +66,8 @@
 &lt;p&gt;Sometimes we also hear the opposite advice. For instance, we &lt;a href=&quot;https://dhh.dk//2014/test-induced-design-damage.html&quot;&gt;can make our tests run faster if we are willing to pay a price in added complexity&lt;/a&gt;. I like fast tests like anyone else but I’m always very wary of trading speed for complexity. Computer cycles are cheap and easily scalable. &lt;strong&gt;Computer power can scale&lt;/strong&gt; horizontally (buying more computers) or vertically (buying more powerful computers). But &lt;strong&gt;your brain capacity is mostly fixed and painfully limited&lt;/strong&gt;. In programming, the brain is often the  main bottleneck.&lt;/p&gt;
 </description>
         <pubDate>Fri, 18 Jan 2019 00:00:00 +0000</pubDate>
-        <link>http://localhost:4000/articles/2019/01/18/cognitive-load-in-programming.html</link>
-        <guid isPermaLink="true">http://localhost:4000/articles/2019/01/18/cognitive-load-in-programming.html</guid>
+        <link>/articles/2019/01/18/cognitive-load-in-programming.html</link>
+        <guid isPermaLink="true">/articles/2019/01/18/cognitive-load-in-programming.html</guid>
         
         
         <category>articles</category>
@@ -206,8 +206,8 @@ following the &lt;a href=&quot;https://tools.ietf.org/html/rfc5988&quot;&gt;RFC5
 &lt;p&gt;If I ever build a more complex API that works, it will be the evolution of a simple API that works.&lt;/p&gt;
 </description>
         <pubDate>Wed, 09 Jan 2019 00:00:00 +0000</pubDate>
-        <link>http://localhost:4000/articles/2019/01/09/minimalistic-rails-api.html</link>
-        <guid isPermaLink="true">http://localhost:4000/articles/2019/01/09/minimalistic-rails-api.html</guid>
+        <link>/articles/2019/01/09/minimalistic-rails-api.html</link>
+        <guid isPermaLink="true">/articles/2019/01/09/minimalistic-rails-api.html</guid>
         
         
         <category>articles</category>
