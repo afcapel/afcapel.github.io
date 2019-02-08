@@ -5,23 +5,22 @@
     <description>Personal Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 08 Feb 2019 12:43:49 +0000</pubDate>
-    <lastBuildDate>Fri, 08 Feb 2019 12:43:49 +0000</lastBuildDate>
+    <pubDate>Fri, 08 Feb 2019 14:23:44 +0000</pubDate>
+    <lastBuildDate>Fri, 08 Feb 2019 14:23:44 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
         <title>Is async I/O worth the trouble?</title>
-        <description>&lt;p&gt;Nodejs has spread asynchronous I/O as way to write server side web applications.
-A few years ago Nodejs popularized asynchronous I/O to write server side web applications.
-Since then I often hear that web applications using an asynchronous server runtime
-are faster and more scalable. And that is true some times, but I don’t think that is the whole story and I want to take a closer look at the tradeoff involved in using async programming for server side web development, its benefits and its cost, and if async I/O is always a good idea.&lt;/p&gt;
+        <description>&lt;p&gt;A few years ago node.js popularised asynchronous I/O to write server side web applications.
+Since then I often hear that asynchronous web applications
+are faster and more scalable. And that is true some times, but I don’t think that is the whole story and I want to take a closer look at the tradeoffs, its benefits and its cost, and if async I/O is always a good idea.&lt;/p&gt;
 
 &lt;p&gt;In this article I’m assuming you’re familiar with how asynchronous and synchronous I/O
-work. If you’re not, you can read the standard &lt;a href=&quot;https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/&quot;&gt;node documentation about the subject&lt;/a&gt;. It includes the standard rationale about why async I/O should be faster.&lt;/p&gt;
+work. If you’re not, you can read the standard &lt;a href=&quot;https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/&quot;&gt;node documentation about the subject&lt;/a&gt;. It includes the usual rationale about why async I/O is faster.&lt;/p&gt;
 
 &lt;h2 id=&quot;async-vs-sync-in-practice&quot;&gt;Async vs sync in practice&lt;/h2&gt;
 
-&lt;p&gt;Let’s compare the performance of a simple HTTP server using async and sync apis.&lt;/p&gt;
+&lt;p&gt;Let’s compare the performance of a simple HTTP server using async and sync APIs.&lt;/p&gt;
 
 &lt;h3 id=&quot;asynchronous-http-server&quot;&gt;Asynchronous HTTP server&lt;/h3&gt;
 
@@ -65,7 +64,7 @@ work. If you’re not, you can read the standard &lt;a href=&quot;https://nodejs
 
 &lt;p&gt;The code is straightforward: when the server receives a request it reads some bytes from &lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/urandom&lt;/code&gt; and packages them in an HTTP response.&lt;/p&gt;
 
-&lt;p&gt;I’m reading 1MB from &lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/urandom&lt;/code&gt; to simulate some kind of I/O during a request, like accessing a database. 1MB may look too much, but that will emphasize the effects of I/O and given the &lt;a href=&quot;https://www.youtube.com/watch?v=iYpl0QVCr6U&quot;&gt;recent website obesity crisis&lt;/a&gt; it’s actually a fairly standard weight for a web page these days.&lt;/p&gt;
+&lt;p&gt;I’m reading 1MB from &lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/urandom&lt;/code&gt; to simulate some kind of I/O during a request, like accessing a database. 1MB may seem too much, but that will emphasise the effects of I/O and given the &lt;a href=&quot;https://www.youtube.com/watch?v=iYpl0QVCr6U&quot;&gt;recent website obesity crisis&lt;/a&gt; it’s actually a fairly standard weight for a web page these days.&lt;/p&gt;
 
 &lt;p&gt;To test the performance of this code I’ve used &lt;a href=&quot;https://httpd.apache.org/docs/2.4/programs/ab.html&quot;&gt;the excellent apache benchmark tool&lt;/a&gt;. I made 100 requests, with a maximum concurrency of 50 and measured the response time.&lt;/p&gt;
 
@@ -77,7 +76,17 @@ Server Software: Server Hostname: localhost Server Port: 3000
 
 Document Path: / Document Length: Variable
 
-Concurrency Level: 50 Time taken for tests: 10.519 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190117975 bytes HTML transferred: 190107875 bytes Requests per second: 9.51 [#/sec] (mean) Time per request: 5259.484 [ms] (mean) Time per request: 105.190 [ms] (mean, across all concurrent requests) Transfer rate: 17650.22 [Kbytes/sec] received
+Concurrency Level: 50
+Time taken for tests: 10.519 seconds
+Complete requests: 100
+Failed requests: 0
+Keep-Alive requests: 0
+Total transferred: 190117975 bytes
+HTML transferred: 190107875 bytes
+Requests per second: 9.51 [#/sec] (mean)
+Time per request: 5259.484 [ms] (mean)
+Time per request: 105.190 [ms] (mean, across all concurrent requests)
+Transfer rate: 17650.22 [Kbytes/sec] received
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;As you can see, &lt;strong&gt;it takes ~10.5 seconds&lt;/strong&gt; to complete.&lt;/p&gt;
@@ -111,28 +120,40 @@ Concurrency Level: 50 Time taken for tests: 10.519 seconds Complete requests: 10
 
 &lt;p&gt;Something to note in the sync version: there’s less nesting in this code, which makes it easier to follow. In the async version, every I/O operation is handled by a callback that must check if the operation succeeded or not. That adds conditional logic, nesting, and makes the whole flow more convoluted. It might not seem a very big deal in a small program, but it can become unwieldy pretty soon in a bigger system in which you need to execute one I/O operation after another.&lt;/p&gt;
 
-&lt;p&gt;Callbacks add so much complexity that we even have a name for too many of them: &lt;a href=&quot;http://callbackhell.com/&quot;&gt;callback hell&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Callbacks can add so much complexity that they often lead to a &lt;a href=&quot;http://callbackhell.com/&quot;&gt;callback hell&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;So, the synchronous code looks simpler, but how does it perform? Let’s measure it:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ab &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; 100 &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; 50 &lt;span class=&quot;nt&quot;&gt;-k&lt;/span&gt; http://localhost:3001/
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ ab -l -r -n 100 -c 50 -k http://localhost:3001/
 
-Benchmarking localhost &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;be patient&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;.....done
+Benchmarking localhost (be patient).....done
 
-Concurrency Level: 50 Time taken &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;tests: 14.188 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190095618 bytes HTML transferred: 190085518 bytes Requests per second: 7.05 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;#/sec] (mean) Time per request: 7094.051 [ms] (mean) Time per request: 141.881 [ms] (mean, across all concurrent requests) Transfer rate: 13084.22 [Kbytes/sec] received&lt;/span&gt;
+Concurrency Level: 50
+Time taken for tests: 14.188 seconds
+Complete requests: 100
+Failed requests: 0
+Keep-Alive requests: 0
+Total transferred: 190095618 bytes
+HTML transferred: 190085518 bytes
+Requests per second: 7.05 [#/sec] (mean)
+Time per request: 7094.051 [ms] (mean)
+Time per request: 141.881 [ms] (mean, across all concurrent requests)
+Transfer rate: 13084.22 [Kbytes/sec] received
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;The sync version takes ~ 14.2 seconds, or 35% slower&lt;/strong&gt;, hence your usual claim that sync APIs are slower.&lt;/p&gt;
 
 &lt;h3 id=&quot;clustered-multiprocess-http-server&quot;&gt;Clustered multiprocess HTTP server&lt;/h3&gt;
 
-&lt;p&gt;So far async I/O seems a reasonable trade off to make: you pay some increased complexity but you get a faster system.&lt;/p&gt;
+&lt;p&gt;So far async I/O seems a reasonable tradeoff to make: you pay some increased complexity but you get a faster system.&lt;/p&gt;
 
-&lt;p&gt;The problem is that the sync example is somewhat contrived and doesn’t represent how you would run an async application in production. Every framework or language doing synchronous I/O already knows that the program execution will be halted during I/O and it’s prepared to deal with it. Application servers usually run in a multi process or multi thread mode. In a multi process mode you have a pool of processes, each waiting for a request. When a process is blocked doing sync I/O the operating system schedules another one that it’s free so you can serve multiple requests concurrently.&lt;/p&gt;
+&lt;p&gt;However, that sync example is somewhat contrived and doesn’t represent how you would run a sync application in production. Every framework or language doing synchronous I/O already knows that the program execution will be halted during I/O and it’s prepared to deal with it. Application servers usually run in a multi process or multi thread mode. In a multi process mode you have a pool of processes, each waiting for a request. When a process is blocked doing sync I/O the operating system schedules another one that it’s free so you can serve multiple requests concurrently.&lt;/p&gt;
 
 &lt;p&gt;With sync I/O you don’t have to worry about concurrency: the operating system already handles concurrency for you. And operating systems are very efficient at running multiple processes concurrently and ensuring they are isolated from each other.&lt;/p&gt;
 
-&lt;p&gt;The multi thread mode is similar, but instead of a pool of processes, you have a pool of threads. A thread requires less memory than a process, but it also gives you less guarantees in terms of isolation, so there’s a also tradeoff between simplicity and efficiency here.&lt;/p&gt;
+&lt;p&gt;The multi thread mode is similar, but instead of a pool of processes, you have a pool of threads. A thread requires less memory than a process, but it also gives you less guarantees in terms of isolation, so there’s also a tradeoff here between simplicity and efficiency.&lt;/p&gt;
+
+&lt;p&gt;Let’s see how a clustered solution would look like:&lt;/p&gt;
 
 &lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cluster&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'cluster'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'http'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -172,19 +193,29 @@ Concurrency Level: 50 Time taken &lt;span class=&quot;k&quot;&gt;for &lt;/span&g
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;This example is similar to the async one, but instead of only one process I’ve created 10.&lt;/p&gt;
+&lt;p&gt;This example is similar to the sync one, but instead of only one process I’ve created 10.&lt;/p&gt;
 
-&lt;p&gt;Clustering a good practice even if you are only using async APIs. Nodejs is a single threaded environment, so in order to take full advantage of all the cores in your server you need to use some kind of clustering. That’s why the cluster module is in the Nodejs standard library.&lt;/p&gt;
+&lt;p&gt;Clustering is a good practice even if you are only using async APIs. Nodejs is a single threaded environment, so in order to take full advantage of all the cores in your server you need to use some kind of clustering. That’s why the cluster module is in the Nodejs standard library.&lt;/p&gt;
 
-&lt;p&gt;We are not adding much complexity here: clustering is something you  need to do anyway, whether you are using sync or async apis.&lt;/p&gt;
+&lt;p&gt;We are not adding much complexity here: clustering is something you  need to do anyway, whether you are using sync or async APIs.&lt;/p&gt;
 
 &lt;p&gt;Now let’s see how the cluster performs, compared to the previous versions:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ab &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; 100 &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; 50 &lt;span class=&quot;nt&quot;&gt;-k&lt;/span&gt; http://localhost:3002/
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ ab -l -r -n 100 -c 50 -k http://localhost:3002/
 
-Benchmarking localhost &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;be patient&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;.....done
+Benchmarking localhost (be patient).....done
 
-Concurrency Level: 50 Time taken &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;tests: 10.331 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190082895 bytes HTML transferred: 190072795 bytes Requests per second: 9.68 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;#/sec] (mean) Time per request: 5165.651 [ms] (mean) Time per request: 103.313 [ms] (mean, across all concurrent requests) Transfer rate: 17967.52 [Kbytes/sec] received&lt;/span&gt;
+Concurrency Level: 50
+Time taken for tests: 10.331 seconds
+Complete requests: 100
+Failed requests: 0
+Keep-Alive requests: 0
+Total transferred: 190082895 bytes
+HTML transferred: 190072795 bytes
+Requests per second: 9.68 [#/sec] (mean)
+Time per request: 5165.651 [ms] (mean)
+Time per request: 103.313 [ms] (mean, across all concurrent requests)
+Transfer rate: 17967.52 [Kbytes/sec] received
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;That’s approximately &lt;strong&gt;the same performance than the async version&lt;/strong&gt;! What’s happening here?&lt;/p&gt;
@@ -199,16 +230,16 @@ Concurrency Level: 50 Time taken &lt;span class=&quot;k&quot;&gt;for &lt;/span&g
 
 &lt;h4 id=&quot;multiple-processes-will-take-much-more-memory&quot;&gt;Multiple processes will take much more memory&lt;/h4&gt;
 
-&lt;p&gt;This might be true for multiprocess servers, but memory is cheap and it’s rarely the main bottleneck. I’d argue that &lt;a href=&quot;https://afcapel.com/articles/2019/01/18/cognitive-load-in-programming.html&quot;&gt;your brain is more likely to be the bottleneck&lt;/a&gt;, so anything that you do decrease complexity will be more valuable that saving RAM.&lt;/p&gt;
+&lt;p&gt;This might be true for multiprocess servers, but memory is cheap and it’s rarely the main bottleneck. I’d argue that &lt;a href=&quot;https://afcapel.com/articles/2019/01/18/cognitive-load-in-programming.html&quot;&gt;your brain is more likely to be the bottleneck&lt;/a&gt;, so anything that you to do decrease complexity will be more valuable that saving RAM.&lt;/p&gt;
 
 &lt;h4 id=&quot;threads-are-complicated&quot;&gt;Threads are complicated&lt;/h4&gt;
 
-&lt;p&gt;This is true for general programs, but it doesn’t apply well to web applications. In a web application you have very simple isolation scheme: each request is executed in a thread. Different requests shouldn’t share information and so different threads don’t need to share information either.&lt;/p&gt;
+&lt;p&gt;This is true for general programs, but it doesn’t apply well to web applications. In a web application you have a very simple isolation scheme: each request is executed within a thread. Different requests shouldn’t share information and so different threads don’t need to share information either.&lt;/p&gt;
 
 &lt;h4 id=&quot;slow-clients&quot;&gt;Slow clients&lt;/h4&gt;
 
 &lt;p&gt;You might have an application, for example a chat, in which clients are idle most of the time
-and they only interact with the server sporadically. It seems a waste of resources to keep a process or thread blocked all the time waiting for the odd interaction. That’s true, but in those cases you can &lt;a href=&quot;https://evilmartians.com/chronicles/anycable-actioncable-on-steroids&quot;&gt;offload the connection management and message parsing to an application
+and they only interact with the server sporadically. It seems a waste of resources to keep a process or thread blocked all the time waiting for the odd interaction. That’s true, but in those cases you can &lt;a href=&quot;https://evilmartians.com/chronicles/anycable-actioncable-on-steroids&quot;&gt;offload the connection management and message parsing to an async application
 server&lt;/a&gt; and handle the responses in your application with synchronous code.&lt;/p&gt;
 
 &lt;h4 id=&quot;so-should-i-use-sync-io-in-node&quot;&gt;So… should I use sync I/O in node?&lt;/h4&gt;
@@ -223,7 +254,7 @@ like GUIs, or client side code where multiple processes are not an option.&lt;/p
 
 &lt;h4 id=&quot;but-async&quot;&gt;But async!&lt;/h4&gt;
 
-&lt;p&gt;Lastly, some people will argue that async I/O is no longer problematic since ES7 introduced &lt;code class=&quot;highlighter-rouge&quot;&gt;async&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;await&lt;/code&gt;.  &lt;code class=&quot;highlighter-rouge&quot;&gt;async&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;await&lt;/code&gt; are new keywords to handle asynchronous operations in a synchronous-like way, for instance you can transform this code:&lt;/p&gt;
+&lt;p&gt;Lastly, some people will argue that async I/O is no longer problematic since ES7 introduced &lt;code class=&quot;highlighter-rouge&quot;&gt;async&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;await&lt;/code&gt;.  &lt;code class=&quot;highlighter-rouge&quot;&gt;async&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;await&lt;/code&gt; are new keywords to handle asynchronous operations in a synchronous-like way. For instance, you can transform this code:&lt;/p&gt;
 
 &lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firstFunction&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hello&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;secondFunction&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;first&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;first&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; world&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -262,13 +293,13 @@ like GUIs, or client side code where multiple processes are not an option.&lt;/p
 
 &lt;p&gt;This is clearly an improvement, but it’s still more complicated than it should be.&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;async&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;await&lt;/code&gt; are wrappers on top of the &lt;code class=&quot;highlighter-rouge&quot;&gt;Promise&lt;/code&gt; interface, and that’s
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;async&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;await&lt;/code&gt; are wrappers on top of the &lt;code class=&quot;highlighter-rouge&quot;&gt;Promise&lt;/code&gt; interface, and &lt;code class=&quot;highlighter-rouge&quot;&gt;Promise&lt;/code&gt; is
 another wrapper around asynchronous calls. You still need to understand all those modes of
 operation. What’s worse, we can mix the three, making the code inconsistent.&lt;/p&gt;
 
 &lt;p&gt;Also, in the example, &lt;code class=&quot;highlighter-rouge&quot;&gt;secondFunction&lt;/code&gt; doesn’t execute until &lt;code class=&quot;highlighter-rouge&quot;&gt;firstFunction&lt;/code&gt; is finished.
 &lt;strong&gt;We have removed the concurrent execution that was the reason to prefer async programming
-in the first place&lt;/strong&gt;. In a way, we have implemented sync semantics (and performance) on top of an async API. But as we saw, the performance different was not really significant to begin with. After all this long journey, wouldn’t have been easier have kept synchronous programming from the beginning?&lt;/p&gt;
+in the first place&lt;/strong&gt;. In a way, we have implemented sync semantics (and performance) adding layers of abstraction on top of the overcomplicated async API. But as we saw, the performance difference was not really significant to begin with. After all this long journey, wouldn’t have been easier to follow synchronous programming from the beginning?&lt;/p&gt;
 </description>
         <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
         <link>http://localhost:4000/articles/2019/02/08/is-async-io-worth-the-trouble.html</link>

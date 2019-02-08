@@ -152,17 +152,16 @@
 
 			<!-- Post Content -->
 			<div class="article-post">
-				<p>Nodejs has spread asynchronous I/O as way to write server side web applications.
-A few years ago Nodejs popularized asynchronous I/O to write server side web applications.
-Since then I often hear that web applications using an asynchronous server runtime
-are faster and more scalable. And that is true some times, but I don’t think that is the whole story and I want to take a closer look at the tradeoff involved in using async programming for server side web development, its benefits and its cost, and if async I/O is always a good idea.</p>
+				<p>A few years ago node.js popularised asynchronous I/O to write server side web applications.
+Since then I often hear that asynchronous web applications
+are faster and more scalable. And that is true some times, but I don’t think that is the whole story and I want to take a closer look at the tradeoffs, its benefits and its cost, and if async I/O is always a good idea.</p>
 
 <p>In this article I’m assuming you’re familiar with how asynchronous and synchronous I/O
-work. If you’re not, you can read the standard <a href="https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/">node documentation about the subject</a>. It includes the standard rationale about why async I/O should be faster.</p>
+work. If you’re not, you can read the standard <a href="https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/">node documentation about the subject</a>. It includes the usual rationale about why async I/O is faster.</p>
 
 <h2 id="async-vs-sync-in-practice">Async vs sync in practice</h2>
 
-<p>Let’s compare the performance of a simple HTTP server using async and sync apis.</p>
+<p>Let’s compare the performance of a simple HTTP server using async and sync APIs.</p>
 
 <h3 id="asynchronous-http-server">Asynchronous HTTP server</h3>
 
@@ -206,7 +205,7 @@ work. If you’re not, you can read the standard <a href="https://nodejs.org/en/
 
 <p>The code is straightforward: when the server receives a request it reads some bytes from <code class="highlighter-rouge">/dev/urandom</code> and packages them in an HTTP response.</p>
 
-<p>I’m reading 1MB from <code class="highlighter-rouge">/dev/urandom</code> to simulate some kind of I/O during a request, like accessing a database. 1MB may look too much, but that will emphasize the effects of I/O and given the <a href="https://www.youtube.com/watch?v=iYpl0QVCr6U">recent website obesity crisis</a> it’s actually a fairly standard weight for a web page these days.</p>
+<p>I’m reading 1MB from <code class="highlighter-rouge">/dev/urandom</code> to simulate some kind of I/O during a request, like accessing a database. 1MB may seem too much, but that will emphasise the effects of I/O and given the <a href="https://www.youtube.com/watch?v=iYpl0QVCr6U">recent website obesity crisis</a> it’s actually a fairly standard weight for a web page these days.</p>
 
 <p>To test the performance of this code I’ve used <a href="https://httpd.apache.org/docs/2.4/programs/ab.html">the excellent apache benchmark tool</a>. I made 100 requests, with a maximum concurrency of 50 and measured the response time.</p>
 
@@ -218,7 +217,17 @@ Server Software: Server Hostname: localhost Server Port: 3000
 
 Document Path: / Document Length: Variable
 
-Concurrency Level: 50 Time taken for tests: 10.519 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190117975 bytes HTML transferred: 190107875 bytes Requests per second: 9.51 [#/sec] (mean) Time per request: 5259.484 [ms] (mean) Time per request: 105.190 [ms] (mean, across all concurrent requests) Transfer rate: 17650.22 [Kbytes/sec] received
+Concurrency Level: 50
+Time taken for tests: 10.519 seconds
+Complete requests: 100
+Failed requests: 0
+Keep-Alive requests: 0
+Total transferred: 190117975 bytes
+HTML transferred: 190107875 bytes
+Requests per second: 9.51 [#/sec] (mean)
+Time per request: 5259.484 [ms] (mean)
+Time per request: 105.190 [ms] (mean, across all concurrent requests)
+Transfer rate: 17650.22 [Kbytes/sec] received
 </code></pre></div></div>
 
 <p>As you can see, <strong>it takes ~10.5 seconds</strong> to complete.</p>
@@ -252,28 +261,40 @@ Concurrency Level: 50 Time taken for tests: 10.519 seconds Complete requests: 10
 
 <p>Something to note in the sync version: there’s less nesting in this code, which makes it easier to follow. In the async version, every I/O operation is handled by a callback that must check if the operation succeeded or not. That adds conditional logic, nesting, and makes the whole flow more convoluted. It might not seem a very big deal in a small program, but it can become unwieldy pretty soon in a bigger system in which you need to execute one I/O operation after another.</p>
 
-<p>Callbacks add so much complexity that we even have a name for too many of them: <a href="http://callbackhell.com/">callback hell</a>.</p>
+<p>Callbacks can add so much complexity that they often lead to a <a href="http://callbackhell.com/">callback hell</a>.</p>
 
 <p>So, the synchronous code looks simpler, but how does it perform? Let’s measure it:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ab <span class="nt">-l</span> <span class="nt">-r</span> <span class="nt">-n</span> 100 <span class="nt">-c</span> 50 <span class="nt">-k</span> http://localhost:3001/
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ab -l -r -n 100 -c 50 -k http://localhost:3001/
 
-Benchmarking localhost <span class="o">(</span>be patient<span class="o">)</span>.....done
+Benchmarking localhost (be patient).....done
 
-Concurrency Level: 50 Time taken <span class="k">for </span>tests: 14.188 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190095618 bytes HTML transferred: 190085518 bytes Requests per second: 7.05 <span class="o">[</span><span class="c">#/sec] (mean) Time per request: 7094.051 [ms] (mean) Time per request: 141.881 [ms] (mean, across all concurrent requests) Transfer rate: 13084.22 [Kbytes/sec] received</span>
+Concurrency Level: 50
+Time taken for tests: 14.188 seconds
+Complete requests: 100
+Failed requests: 0
+Keep-Alive requests: 0
+Total transferred: 190095618 bytes
+HTML transferred: 190085518 bytes
+Requests per second: 7.05 [#/sec] (mean)
+Time per request: 7094.051 [ms] (mean)
+Time per request: 141.881 [ms] (mean, across all concurrent requests)
+Transfer rate: 13084.22 [Kbytes/sec] received
 </code></pre></div></div>
 
 <p><strong>The sync version takes ~ 14.2 seconds, or 35% slower</strong>, hence your usual claim that sync APIs are slower.</p>
 
 <h3 id="clustered-multiprocess-http-server">Clustered multiprocess HTTP server</h3>
 
-<p>So far async I/O seems a reasonable trade off to make: you pay some increased complexity but you get a faster system.</p>
+<p>So far async I/O seems a reasonable tradeoff to make: you pay some increased complexity but you get a faster system.</p>
 
-<p>The problem is that the sync example is somewhat contrived and doesn’t represent how you would run an async application in production. Every framework or language doing synchronous I/O already knows that the program execution will be halted during I/O and it’s prepared to deal with it. Application servers usually run in a multi process or multi thread mode. In a multi process mode you have a pool of processes, each waiting for a request. When a process is blocked doing sync I/O the operating system schedules another one that it’s free so you can serve multiple requests concurrently.</p>
+<p>However, that sync example is somewhat contrived and doesn’t represent how you would run a sync application in production. Every framework or language doing synchronous I/O already knows that the program execution will be halted during I/O and it’s prepared to deal with it. Application servers usually run in a multi process or multi thread mode. In a multi process mode you have a pool of processes, each waiting for a request. When a process is blocked doing sync I/O the operating system schedules another one that it’s free so you can serve multiple requests concurrently.</p>
 
 <p>With sync I/O you don’t have to worry about concurrency: the operating system already handles concurrency for you. And operating systems are very efficient at running multiple processes concurrently and ensuring they are isolated from each other.</p>
 
-<p>The multi thread mode is similar, but instead of a pool of processes, you have a pool of threads. A thread requires less memory than a process, but it also gives you less guarantees in terms of isolation, so there’s a also tradeoff between simplicity and efficiency here.</p>
+<p>The multi thread mode is similar, but instead of a pool of processes, you have a pool of threads. A thread requires less memory than a process, but it also gives you less guarantees in terms of isolation, so there’s also a tradeoff here between simplicity and efficiency.</p>
+
+<p>Let’s see how a clustered solution would look like:</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cluster</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'cluster'</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">)</span>
@@ -313,19 +334,29 @@ Concurrency Level: 50 Time taken <span class="k">for </span>tests: 14.188 second
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This example is similar to the async one, but instead of only one process I’ve created 10.</p>
+<p>This example is similar to the sync one, but instead of only one process I’ve created 10.</p>
 
-<p>Clustering a good practice even if you are only using async APIs. Nodejs is a single threaded environment, so in order to take full advantage of all the cores in your server you need to use some kind of clustering. That’s why the cluster module is in the Nodejs standard library.</p>
+<p>Clustering is a good practice even if you are only using async APIs. Nodejs is a single threaded environment, so in order to take full advantage of all the cores in your server you need to use some kind of clustering. That’s why the cluster module is in the Nodejs standard library.</p>
 
-<p>We are not adding much complexity here: clustering is something you  need to do anyway, whether you are using sync or async apis.</p>
+<p>We are not adding much complexity here: clustering is something you  need to do anyway, whether you are using sync or async APIs.</p>
 
 <p>Now let’s see how the cluster performs, compared to the previous versions:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ab <span class="nt">-l</span> <span class="nt">-r</span> <span class="nt">-n</span> 100 <span class="nt">-c</span> 50 <span class="nt">-k</span> http://localhost:3002/
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ab -l -r -n 100 -c 50 -k http://localhost:3002/
 
-Benchmarking localhost <span class="o">(</span>be patient<span class="o">)</span>.....done
+Benchmarking localhost (be patient).....done
 
-Concurrency Level: 50 Time taken <span class="k">for </span>tests: 10.331 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190082895 bytes HTML transferred: 190072795 bytes Requests per second: 9.68 <span class="o">[</span><span class="c">#/sec] (mean) Time per request: 5165.651 [ms] (mean) Time per request: 103.313 [ms] (mean, across all concurrent requests) Transfer rate: 17967.52 [Kbytes/sec] received</span>
+Concurrency Level: 50
+Time taken for tests: 10.331 seconds
+Complete requests: 100
+Failed requests: 0
+Keep-Alive requests: 0
+Total transferred: 190082895 bytes
+HTML transferred: 190072795 bytes
+Requests per second: 9.68 [#/sec] (mean)
+Time per request: 5165.651 [ms] (mean)
+Time per request: 103.313 [ms] (mean, across all concurrent requests)
+Transfer rate: 17967.52 [Kbytes/sec] received
 </code></pre></div></div>
 
 <p>That’s approximately <strong>the same performance than the async version</strong>! What’s happening here?</p>
@@ -340,16 +371,16 @@ Concurrency Level: 50 Time taken <span class="k">for </span>tests: 10.331 second
 
 <h4 id="multiple-processes-will-take-much-more-memory">Multiple processes will take much more memory</h4>
 
-<p>This might be true for multiprocess servers, but memory is cheap and it’s rarely the main bottleneck. I’d argue that <a href="https://afcapel.com/articles/2019/01/18/cognitive-load-in-programming.html">your brain is more likely to be the bottleneck</a>, so anything that you do decrease complexity will be more valuable that saving RAM.</p>
+<p>This might be true for multiprocess servers, but memory is cheap and it’s rarely the main bottleneck. I’d argue that <a href="https://afcapel.com/articles/2019/01/18/cognitive-load-in-programming.html">your brain is more likely to be the bottleneck</a>, so anything that you to do decrease complexity will be more valuable that saving RAM.</p>
 
 <h4 id="threads-are-complicated">Threads are complicated</h4>
 
-<p>This is true for general programs, but it doesn’t apply well to web applications. In a web application you have very simple isolation scheme: each request is executed in a thread. Different requests shouldn’t share information and so different threads don’t need to share information either.</p>
+<p>This is true for general programs, but it doesn’t apply well to web applications. In a web application you have a very simple isolation scheme: each request is executed within a thread. Different requests shouldn’t share information and so different threads don’t need to share information either.</p>
 
 <h4 id="slow-clients">Slow clients</h4>
 
 <p>You might have an application, for example a chat, in which clients are idle most of the time
-and they only interact with the server sporadically. It seems a waste of resources to keep a process or thread blocked all the time waiting for the odd interaction. That’s true, but in those cases you can <a href="https://evilmartians.com/chronicles/anycable-actioncable-on-steroids">offload the connection management and message parsing to an application
+and they only interact with the server sporadically. It seems a waste of resources to keep a process or thread blocked all the time waiting for the odd interaction. That’s true, but in those cases you can <a href="https://evilmartians.com/chronicles/anycable-actioncable-on-steroids">offload the connection management and message parsing to an async application
 server</a> and handle the responses in your application with synchronous code.</p>
 
 <h4 id="so-should-i-use-sync-io-in-node">So… should I use sync I/O in node?</h4>
@@ -364,7 +395,7 @@ like GUIs, or client side code where multiple processes are not an option.</p>
 
 <h4 id="but-async">But async!</h4>
 
-<p>Lastly, some people will argue that async I/O is no longer problematic since ES7 introduced <code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code>.  <code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code> are new keywords to handle asynchronous operations in a synchronous-like way, for instance you can transform this code:</p>
+<p>Lastly, some people will argue that async I/O is no longer problematic since ES7 introduced <code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code>.  <code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code> are new keywords to handle asynchronous operations in a synchronous-like way. For instance, you can transform this code:</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">firstFunction</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">)</span>
 <span class="kd">const</span> <span class="nx">secondFunction</span> <span class="o">=</span> <span class="p">(</span><span class="nx">first</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">first</span> <span class="o">+</span> <span class="s2">" world"</span><span class="p">)</span>
@@ -403,13 +434,13 @@ like GUIs, or client side code where multiple processes are not an option.</p>
 
 <p>This is clearly an improvement, but it’s still more complicated than it should be.</p>
 
-<p><code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code> are wrappers on top of the <code class="highlighter-rouge">Promise</code> interface, and that’s
+<p><code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code> are wrappers on top of the <code class="highlighter-rouge">Promise</code> interface, and <code class="highlighter-rouge">Promise</code> is
 another wrapper around asynchronous calls. You still need to understand all those modes of
 operation. What’s worse, we can mix the three, making the code inconsistent.</p>
 
 <p>Also, in the example, <code class="highlighter-rouge">secondFunction</code> doesn’t execute until <code class="highlighter-rouge">firstFunction</code> is finished.
 <strong>We have removed the concurrent execution that was the reason to prefer async programming
-in the first place</strong>. In a way, we have implemented sync semantics (and performance) on top of an async API. But as we saw, the performance different was not really significant to begin with. After all this long journey, wouldn’t have been easier have kept synchronous programming from the beginning?</p>
+in the first place</strong>. In a way, we have implemented sync semantics (and performance) adding layers of abstraction on top of the overcomplicated async API. But as we saw, the performance difference was not really significant to begin with. After all this long journey, wouldn’t have been easier to follow synchronous programming from the beginning?</p>
 
 			</div>
 
