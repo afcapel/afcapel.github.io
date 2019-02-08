@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Is async I/O worth the trouble?"
+title:  "Is async programming worth the trouble?"
 author: alberto
 categories: articles
 image: assets/images/telephone.jpg
@@ -247,7 +247,7 @@ server](https://evilmartians.com/chronicles/anycable-actioncable-on-steroids) an
 
 #### So... should I use sync I/O in node?
 
-No! The whole nodejs ecosystem assumes that all your code will be asynchronous. Mixing
+No! The whole node ecosystem assumes that all your code will be asynchronous. Mixing
 synchronous and asynchronous code will lead to terrible results. If you are stuck with node,
 follow the beaten path and write async code. However, if you have the opportunity try to consider
 other sync environments for you next project.

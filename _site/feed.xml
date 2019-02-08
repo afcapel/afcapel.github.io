@@ -5,12 +5,12 @@
     <description>Personal Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 08 Feb 2019 14:23:44 +0000</pubDate>
-    <lastBuildDate>Fri, 08 Feb 2019 14:23:44 +0000</lastBuildDate>
+    <pubDate>Fri, 08 Feb 2019 14:25:59 +0000</pubDate>
+    <lastBuildDate>Fri, 08 Feb 2019 14:25:59 +0000</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
-        <title>Is async I/O worth the trouble?</title>
+        <title>Is async programming worth the trouble?</title>
         <description>&lt;p&gt;A few years ago node.js popularised asynchronous I/O to write server side web applications.
 Since then I often hear that asynchronous web applications
 are faster and more scalable. And that is true some times, but I don’t think that is the whole story and I want to take a closer look at the tradeoffs, its benefits and its cost, and if async I/O is always a good idea.&lt;/p&gt;
@@ -244,7 +244,7 @@ server&lt;/a&gt; and handle the responses in your application with synchronous c
 
 &lt;h4 id=&quot;so-should-i-use-sync-io-in-node&quot;&gt;So… should I use sync I/O in node?&lt;/h4&gt;
 
-&lt;p&gt;No! The whole nodejs ecosystem assumes that all your code will be asynchronous. Mixing
+&lt;p&gt;No! The whole node ecosystem assumes that all your code will be asynchronous. Mixing
 synchronous and asynchronous code will lead to terrible results. If you are stuck with node,
 follow the beaten path and write async code. However, if you have the opportunity try to consider
 other sync environments for you next project.&lt;/p&gt;
