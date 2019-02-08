@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/logo.png">
+
+<title>Is async I/O worth the trouble? | Alberto Fernández-Capel</title>
+
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
+
+<link href="/assets/css/screen.css" rel="stylesheet">
+
+<link href="/assets/css/main.css" rel="stylesheet">
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/turbolinks/5.2.0/turbolinks.js" integrity="sha256-iM4Yzi/zLj/IshPWMC1IluRxTtRjMqjPGd97TZ9yYpU=" crossorigin="anonymous"></script>
+
+<link rel="alternate" type="application/rss+xml" href="/feed.xml" />
+
+</head>
+
+
+
+<body class="layout-post">
+
+
+<!-- Begin Menu Navigation
+================================================== -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top mediumnavigation nav-down">
+
+    <div class="container pr-0">
+
+    <!-- Site brand
+    ================================================== -->
+    <a class="navbar-brand" href="/">
+      Alberto Fernández-Capel
+      <small class="text-muted d-none d-md-inline">Personal Blog</small>
+    </a>
+    <!-- End brand -->
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMediumish" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+    <div class="collapse navbar-collapse" id="navbarMediumish">
+
+        <!-- Begin Menu -->
+
+            <ul class="navbar-nav ml-auto">
+
+                
+                <li class="nav-item">
+                
+                <a class="nav-link" href="/index.html">Blog</a>
+                </li>
+
+                
+                <li class="nav-item">
+                
+                <a class="nav-link" href="/about">About</a>
+                </li>
+
+                <li class="nav-item">
+                <a target="_blank"  class="nav-link" href="https://twitter.com/afcapel"><i class="fab fa-twitter"></i></a>
+                </li>
+
+            </ul>
+
+        <!-- End Menu -->
+
+    </div>
+
+    </div>
+</nav>
+<!-- End Navigation
+================================================== -->
+
+<div class="site-content">
+<div class="container">
+
+
+
+<!-- Content
+================================================== -->
+<div class="main-content">
+    <!-- Begin Article
+================================================== -->
+<div class="container">
+	<div class="row">
+
+		<!-- Post Share -->
+		<div class="col-md-2 pl-0">
+           <div class="share">
+    <p>
+        Share
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+        <a target="_blank" href="https://twitter.com/intent/tweet?text=Is async I/O worth the trouble?&url=http://localhost:4000/articles/2019/02/08/is-async-io-worth-the-trouble.html" rel="noopener noreferrer">
+        <i class="fab fa-twitter"></i>
+        </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+        <a target="_blank" href="https://news.ycombinator.com/submitlink?u=http://localhost:4000/articles/2019/02/08/is-async-io-worth-the-trouble.html&t=Is async I/O worth the trouble?" rel="noopener noreferrer">
+        <i class="fab fa-hacker-news"></i>
+        </a>
+        </li>
+    </ul>
+</div>
+
+		</div>
+
+
+		<!-- Post -->
+        
+
+		<div class="col-md-9 flex-first flex-md-unordered">
+			<div class="mainheading">
+
+                <!-- Author Box -->
+                
+				<div class="row post-top-meta">
+					<div class="col-md-2 col-4">
+						<img class="author-thumb" src="https://www.gravatar.com/avatar/ec109e50efa17647903b7f31eee1c458?s=250&d=mm&r=x" alt="Alberto">
+					</div>
+					<div class="col-md-10 col-8">
+						<a target="_blank" class="link-dark" href="https://afcapel.com">Alberto</a><a target="_blank" href="https://twitter.com/afcapel" class="btn follow">Follow</a>
+						<span class="author-description">I build software</span>
+					</div>
+				</div>
+                
+
+                <!-- Post Title -->
+				<h1 class="posttitle">Is async I/O worth the trouble?</h1>
+
+			</div>
+
+			<!-- Post Featured Image -->
+			<img class="featured-image w-100 img-fluid" src="http://localhost:4000/assets/images/telephone.jpg" alt="Is async I/O worth the trouble?">
+			<!-- End Featured Image -->
+
+			<!-- Post Content -->
+			<div class="article-post">
+				<p>Nodejs has spread asynchronous I/O as way to write server side web applications.
+A few years ago Nodejs popularized asynchronous I/O to write server side web applications.
+Since then I often hear that web applications using an asynchronous server runtime
+are faster and more scalable. And that is true some times, but I don’t think that is the whole story and I want to take a closer look at the tradeoff involved in using async programming for server side web development, its benefits and its cost, and if async I/O is always a good idea.</p>
+
+<p>In this article I’m assuming you’re familiar with how asynchronous and synchronous I/O
+work. If you’re not, you can read the standard <a href="https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/">node documentation about the subject</a>. It includes the standard rationale about why async I/O should be faster.</p>
+
+<h2 id="async-vs-sync-in-practice">Async vs sync in practice</h2>
+
+<p>Let’s compare the performance of a simple HTTP server using async and sync apis.</p>
+
+<h3 id="asynchronous-http-server">Asynchronous HTTP server</h3>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">fs</span>   <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">nBytes</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="mi">3000</span>
+
+<span class="kd">const</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">((</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">'/dev/urandom'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">fd</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'something bad happened'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+      <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">allocUnsafe</span><span class="p">(</span><span class="nx">nBytes</span><span class="p">)</span>
+
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="nx">fd</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">nBytes</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">bytesRead</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'something bad happened'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="p">}</span>
+
+      <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="s2">"utf8"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">nBytes</span><span class="p">)</span>
+      <span class="nx">response</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s1">'Content-Type'</span><span class="p">:</span> <span class="s1">'text/plain'</span><span class="p">})</span>
+      <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+
+<span class="p">}).</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'something bad happened'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`server is listening on </span><span class="p">${</span><span class="nx">port</span><span class="p">}</span><span class="s2">`</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p>The code is straightforward: when the server receives a request it reads some bytes from <code class="highlighter-rouge">/dev/urandom</code> and packages them in an HTTP response.</p>
+
+<p>I’m reading 1MB from <code class="highlighter-rouge">/dev/urandom</code> to simulate some kind of I/O during a request, like accessing a database. 1MB may look too much, but that will emphasize the effects of I/O and given the <a href="https://www.youtube.com/watch?v=iYpl0QVCr6U">recent website obesity crisis</a> it’s actually a fairly standard weight for a web page these days.</p>
+
+<p>To test the performance of this code I’ve used <a href="https://httpd.apache.org/docs/2.4/programs/ab.html">the excellent apache benchmark tool</a>. I made 100 requests, with a maximum concurrency of 50 and measured the response time.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ab -l -r -n 100 -c 50 -k http://localhost:3000/ This is ApacheBench, Version 2.3 &lt;$Revision: 1807734 $&gt; Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/ Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient).....done
+
+Server Software: Server Hostname: localhost Server Port: 3000
+
+Document Path: / Document Length: Variable
+
+Concurrency Level: 50 Time taken for tests: 10.519 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190117975 bytes HTML transferred: 190107875 bytes Requests per second: 9.51 [#/sec] (mean) Time per request: 5259.484 [ms] (mean) Time per request: 105.190 [ms] (mean, across all concurrent requests) Transfer rate: 17650.22 [Kbytes/sec] received
+</code></pre></div></div>
+
+<p>As you can see, <strong>it takes ~10.5 seconds</strong> to complete.</p>
+
+<h3 id="synchronous-http-server">Synchronous HTTP server</h3>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">fs</span>   <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">nBytes</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="kd">const</span> <span class="nx">port</span> <span class="o">=</span> <span class="mi">3001</span>
+
+<span class="kd">const</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">((</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">fd</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">openSync</span><span class="p">(</span><span class="s1">'/dev/urandom'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span>
+  <span class="kd">const</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">allocUnsafe</span><span class="p">(</span><span class="nx">nBytes</span><span class="p">)</span>
+
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">readSync</span><span class="p">(</span><span class="nx">fd</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">nBytes</span><span class="p">)</span>
+  <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="s2">"utf8"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">nBytes</span><span class="p">)</span>
+
+  <span class="nx">response</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s1">'Content-Type'</span><span class="p">:</span> <span class="s1">'text/plain'</span><span class="p">})</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+
+<span class="p">}).</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'something bad happened'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`server is listening on </span><span class="p">${</span><span class="nx">port</span><span class="p">}</span><span class="s2">`</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p>Something to note in the sync version: there’s less nesting in this code, which makes it easier to follow. In the async version, every I/O operation is handled by a callback that must check if the operation succeeded or not. That adds conditional logic, nesting, and makes the whole flow more convoluted. It might not seem a very big deal in a small program, but it can become unwieldy pretty soon in a bigger system in which you need to execute one I/O operation after another.</p>
+
+<p>Callbacks add so much complexity that we even have a name for too many of them: <a href="http://callbackhell.com/">callback hell</a>.</p>
+
+<p>So, the synchronous code looks simpler, but how does it perform? Let’s measure it:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ab <span class="nt">-l</span> <span class="nt">-r</span> <span class="nt">-n</span> 100 <span class="nt">-c</span> 50 <span class="nt">-k</span> http://localhost:3001/
+
+Benchmarking localhost <span class="o">(</span>be patient<span class="o">)</span>.....done
+
+Concurrency Level: 50 Time taken <span class="k">for </span>tests: 14.188 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190095618 bytes HTML transferred: 190085518 bytes Requests per second: 7.05 <span class="o">[</span><span class="c">#/sec] (mean) Time per request: 7094.051 [ms] (mean) Time per request: 141.881 [ms] (mean, across all concurrent requests) Transfer rate: 13084.22 [Kbytes/sec] received</span>
+</code></pre></div></div>
+
+<p><strong>The sync version takes ~ 14.2 seconds, or 35% slower</strong>, hence your usual claim that sync APIs are slower.</p>
+
+<h3 id="clustered-multiprocess-http-server">Clustered multiprocess HTTP server</h3>
+
+<p>So far async I/O seems a reasonable trade off to make: you pay some increased complexity but you get a faster system.</p>
+
+<p>The problem is that the sync example is somewhat contrived and doesn’t represent how you would run an async application in production. Every framework or language doing synchronous I/O already knows that the program execution will be halted during I/O and it’s prepared to deal with it. Application servers usually run in a multi process or multi thread mode. In a multi process mode you have a pool of processes, each waiting for a request. When a process is blocked doing sync I/O the operating system schedules another one that it’s free so you can serve multiple requests concurrently.</p>
+
+<p>With sync I/O you don’t have to worry about concurrency: the operating system already handles concurrency for you. And operating systems are very efficient at running multiple processes concurrently and ensuring they are isolated from each other.</p>
+
+<p>The multi thread mode is similar, but instead of a pool of processes, you have a pool of threads. A thread requires less memory than a process, but it also gives you less guarantees in terms of isolation, so there’s a also tradeoff between simplicity and efficiency here.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cluster</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'cluster'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">fs</span>   <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">nBytes</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="kd">const</span> <span class="nx">nProcesses</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nx">cluster</span><span class="p">.</span><span class="nx">isMaster</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">masterProcess</span><span class="p">()</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="nx">childProcess</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">masterProcess</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`Master </span><span class="p">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">pid</span><span class="p">}</span><span class="s2"> is running`</span><span class="p">)</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">nProcesses</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`Forking process number </span><span class="p">${</span><span class="nx">i</span><span class="p">}</span><span class="s2">...`</span><span class="p">)</span>
+    <span class="nx">cluster</span><span class="p">.</span><span class="nx">fork</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">childProcess</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`Worker </span><span class="p">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">pid</span><span class="p">}</span><span class="s2"> started...`</span><span class="p">)</span>
+
+  <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">((</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">fd</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">openSync</span><span class="p">(</span><span class="s1">'/dev/urandom'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">allocUnsafe</span><span class="p">(</span><span class="nx">nBytes</span><span class="p">)</span>
+
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">readSync</span><span class="p">(</span><span class="nx">fd</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">nBytes</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="s2">"utf8"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">nBytes</span><span class="p">)</span>
+
+    <span class="nx">response</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s1">'Content-Type'</span><span class="p">:</span> <span class="s1">'text/plain'</span><span class="p">})</span>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">}).</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3002</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This example is similar to the async one, but instead of only one process I’ve created 10.</p>
+
+<p>Clustering a good practice even if you are only using async APIs. Nodejs is a single threaded environment, so in order to take full advantage of all the cores in your server you need to use some kind of clustering. That’s why the cluster module is in the Nodejs standard library.</p>
+
+<p>We are not adding much complexity here: clustering is something you  need to do anyway, whether you are using sync or async apis.</p>
+
+<p>Now let’s see how the cluster performs, compared to the previous versions:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ab <span class="nt">-l</span> <span class="nt">-r</span> <span class="nt">-n</span> 100 <span class="nt">-c</span> 50 <span class="nt">-k</span> http://localhost:3002/
+
+Benchmarking localhost <span class="o">(</span>be patient<span class="o">)</span>.....done
+
+Concurrency Level: 50 Time taken <span class="k">for </span>tests: 10.331 seconds Complete requests: 100 Failed requests: 0 Keep-Alive requests: 0 Total transferred: 190082895 bytes HTML transferred: 190072795 bytes Requests per second: 9.68 <span class="o">[</span><span class="c">#/sec] (mean) Time per request: 5165.651 [ms] (mean) Time per request: 103.313 [ms] (mean, across all concurrent requests) Transfer rate: 17967.52 [Kbytes/sec] received</span>
+</code></pre></div></div>
+
+<p>That’s approximately <strong>the same performance than the async version</strong>! What’s happening here?</p>
+
+<h2 id="modern-cpus-are-very-fast-at-context-switching">Modern CPUs are very fast at context switching</h2>
+
+<p>Modern CPUs and Operating Systems are very efficient doing context switches. A benchmark from 2010 estimated that a context switch takes between <a href="https://blog.tsunanet.net/2010/11/how-long-does-it-take-to-make-context.html">2 and 50 <strong>micro</strong> seconds</a>. I can only assume CPUs have improved since then, but it doesn’t really matter either. A few microseconds per context switch means a HTTP request can be stopped dozens of times and <strong>the overhead is likely to take less than 1ms in modern hardware, which will be hardly noticeable in most web applications</strong>.</p>
+
+<p><strong>Async I/O adds complexity to the execution flow of a program and is not noticeably faster than sync I/O in a multi threaded or multi process environment</strong>.</p>
+
+<h2 id="some-common-objections-to-synchronous-apis">Some common objections to synchronous APIs</h2>
+
+<h4 id="multiple-processes-will-take-much-more-memory">Multiple processes will take much more memory</h4>
+
+<p>This might be true for multiprocess servers, but memory is cheap and it’s rarely the main bottleneck. I’d argue that <a href="https://afcapel.com/articles/2019/01/18/cognitive-load-in-programming.html">your brain is more likely to be the bottleneck</a>, so anything that you do decrease complexity will be more valuable that saving RAM.</p>
+
+<h4 id="threads-are-complicated">Threads are complicated</h4>
+
+<p>This is true for general programs, but it doesn’t apply well to web applications. In a web application you have very simple isolation scheme: each request is executed in a thread. Different requests shouldn’t share information and so different threads don’t need to share information either.</p>
+
+<h4 id="slow-clients">Slow clients</h4>
+
+<p>You might have an application, for example a chat, in which clients are idle most of the time
+and they only interact with the server sporadically. It seems a waste of resources to keep a process or thread blocked all the time waiting for the odd interaction. That’s true, but in those cases you can <a href="https://evilmartians.com/chronicles/anycable-actioncable-on-steroids">offload the connection management and message parsing to an application
+server</a> and handle the responses in your application with synchronous code.</p>
+
+<h4 id="so-should-i-use-sync-io-in-node">So… should I use sync I/O in node?</h4>
+
+<p>No! The whole nodejs ecosystem assumes that all your code will be asynchronous. Mixing
+synchronous and asynchronous code will lead to terrible results. If you are stuck with node,
+follow the beaten path and write async code. However, if you have the opportunity try to consider
+other sync environments for you next project.</p>
+
+<p>Async I/O is also a superior approach in other environments that are not web applications,
+like GUIs, or client side code where multiple processes are not an option.</p>
+
+<h4 id="but-async">But async!</h4>
+
+<p>Lastly, some people will argue that async I/O is no longer problematic since ES7 introduced <code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code>.  <code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code> are new keywords to handle asynchronous operations in a synchronous-like way, for instance you can transform this code:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">firstFunction</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">secondFunction</span> <span class="o">=</span> <span class="p">(</span><span class="nx">first</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">first</span> <span class="o">+</span> <span class="s2">" world"</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">withCallbacks</span> <span class="o">=</span> <span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">firstFunction</span><span class="p">((</span><span class="nx">err</span><span class="p">,</span> <span class="nx">firstResult</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'something bad happened'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+      <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="nx">secondFunction</span><span class="p">(</span><span class="nx">firstResult</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'something bad happened'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="p">}</span>
+
+      <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Into something like:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">firstFunction</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span>  <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">secondFunction</span> <span class="o">=</span> <span class="p">(</span><span class="nx">first</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">first</span> <span class="o">+</span> <span class="s2">" world"</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">withAsync</span> <span class="o">=</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">firstResult</span>  <span class="o">=</span> <span class="kr">await</span> <span class="nx">firstFunction</span><span class="p">()</span>
+  <span class="kd">const</span> <span class="nx">secondResult</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">secondFunction</span><span class="p">(</span><span class="nx">firstResult</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="nx">secondResult</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This is clearly an improvement, but it’s still more complicated than it should be.</p>
+
+<p><code class="highlighter-rouge">async</code> and <code class="highlighter-rouge">await</code> are wrappers on top of the <code class="highlighter-rouge">Promise</code> interface, and that’s
+another wrapper around asynchronous calls. You still need to understand all those modes of
+operation. What’s worse, we can mix the three, making the code inconsistent.</p>
+
+<p>Also, in the example, <code class="highlighter-rouge">secondFunction</code> doesn’t execute until <code class="highlighter-rouge">firstFunction</code> is finished.
+<strong>We have removed the concurrent execution that was the reason to prefer async programming
+in the first place</strong>. In a way, we have implemented sync semantics (and performance) on top of an async API. But as we saw, the performance different was not really significant to begin with. After all this long journey, wouldn’t have been easier have kept synchronous programming from the beginning?</p>
+
+			</div>
+
+            <!-- Post Date -->
+            <p>
+            <small>
+                <span class="post-date"><time class="post-date" datetime="2019-02-08">08 Feb 2019</time></span>
+                
+                </small>
+            </p>
+
+			<!-- Post Categories -->
+			<div class="after-post-tags">
+				<ul class="tags">
+                    
+                    
+                    <li>
+                     <a href="/category/articles/">articles</a>
+                    </li>
+                    
+				</ul>
+			</div>
+			<!-- End Categories -->
+
+            <!-- Prev/Next -->
+            <div class="row PageNavigation d-flex justify-content-between font-weight-bold">
+            
+            <a class="prev d-block col-md-6" href="http://localhost:4000/articles/2019/01/22/how-to-organise-assets-rails-app.html"> &laquo; How to neatly organise assets in a Rails app</a>
+            
+            
+            <div class="clearfix"></div>
+            </div>
+            <!-- End Categories -->
+
+		</div>
+		<!-- End Post -->
+
+	</div>
+</div>
+<!-- End Article
+================================================== -->
+
+</div>
+
+</div><!-- /.container>
+
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container text-center">
+      <p class="text-center">
+        Copyright © 2019 Alberto Fernández-Capel
+      </p>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+
+</div> <!-- /.site-content>
+</body>
+</html>
