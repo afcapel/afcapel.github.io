@@ -1,11 +1,11 @@
 ---
 layout: post
-title:  "How to neatly organise assets in a Rails app"
+title: "How to neatly organise assets in a Rails app"
 author: alberto
 categories: articles
 image: assets/images/shelf.jpg
 featured: true
-hidden: false
+hidden: true
 ---
 
 One of the great things about Rails is that it comes packed with a lot of useful
@@ -125,17 +125,17 @@ app/assets/stylesheets
 The directory structure follows the same layout than views and controllers. **The main
 rule is to always nest the file name to the most specific folder possible**. For instance:
 
-* If some styles are only needed in `app/views/admin/dashboard/show.html.erb` they will
-go in `app/assets/stylesheets/admin/dashboard/_show.scss`.
+- If some styles are only needed in `app/views/admin/dashboard/show.html.erb` they will
+  go in `app/assets/stylesheets/admin/dashboard/_show.scss`.
 
-* If they are shared between actions in the `admin/dashboard_controller`, they would go
-in `app/assets/stylesheets/admin/dashboard.scss`
+- If they are shared between actions in the `admin/dashboard_controller`, they would go
+  in `app/assets/stylesheets/admin/dashboard.scss`
 
-* If they are shared by different admin controllers, they go in
-`app/assets/stylesheets/admin/shared/name_of_the_component.scss`
+- If they are shared by different admin controllers, they go in
+  `app/assets/stylesheets/admin/shared/name_of_the_component.scss`
 
-* If they are shared by controllers with different layouts, they go in
-`app/assets/stylesheets/shared/name_of_the_component.scss`
+- If they are shared by controllers with different layouts, they go in
+  `app/assets/stylesheets/shared/name_of_the_component.scss`
 
 The top level stylesheets just include the folders they need. For instance,
 `app/assets/stylesheets/admin.scss` is just:
